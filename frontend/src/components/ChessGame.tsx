@@ -1,49 +1,55 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
-import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
-
-let socket: Socket;
+import useGame from "../hooks/useGame";
+import { MoveDTO } from "../game.dto";
 
 function ChessGame() {
-  const [game, setGame] = useState(new Chess());
+  const {game} = useGame()
   const [fen, setFen] = useState(game.fen());
   const [socketConnected, setSocketConnected] = useState(false);
+  const socket = useRef<Socket | null>(null)
 
   useEffect(() => {
-    socket = io("http://localhost:3001");
-
-    socket.on("connect", () => {
+    socket.current = io("http://localhost:3001")
+    socket.current.on("connect", () => {
       setSocketConnected(true);
     });
 
-    socket.on(
+    socket.current.on(
       "move",
       (move: { from: string; to: string; promotion?: string }) => {
-        const newGame = new Chess(game.fen());
-        newGame.move(move);
-        setGame(newGame);
-        setFen(newGame.fen());
+        game.move(move);
+        setFen(game.fen());
       },
     );
 
     return () => {
-      socket.disconnect();
+      socket.current?.disconnect();
     };
-  }, []);
+  }, [game]);
 
   const handleMove = (move: { from: string; to: string }): boolean => {
-    const newGame = new Chess(game.fen());
-    const result = newGame.move({
+    const result = game.move({
       from: move.from,
       to: move.to,
       promotion: "q",
     });
 
     if (result) {
-      setGame(newGame);
-      setFen(newGame.fen());
-      socket.emit("move", { from: move.from, to: move.to, promotion: "q" });
+      setFen(game.fen());
+
+      const moveDto: MoveDTO = {
+        player: result.color,
+        before: result.before,
+        after: result.after,
+        san: result.san,
+        from: result.from,
+        to: result.to,
+      }
+
+      console.log('move -> backend: ', result, moveDto)
+      socket.current?.emit("move", JSON.stringify(moveDto));
       return true;
     }
 
