@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Adjust to your frontend port
+    origin: "http://localhost:5173",
     methods: ["GET", "POST"],
   },
 });
@@ -18,47 +18,41 @@ app.use(cors());
 const validateMove = () => {
   // TODO - Add validation
   return true;
-}
+};
 
 const checkDraw = () => {
   // TODO - Add draw checking
-  return true;
-}
+  return false;
+};
 
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
 
+  socket.on("joinGame", (gameId: string) => {
+    socket.join(gameId);
+    console.log(`User ${socket.id} joined game ${gameId}`);
+  });
+
   socket.on("move", (moveReqStr: string) => {
+    const moveReq: MoveRequestDTO & { gameId: string } = JSON.parse(moveReqStr);
+    console.log("Move requested", moveReq);
 
-    const moveReq: MoveRequestDTO = JSON.parse(moveReqStr)
-    console.log("Move requested ", moveReq);
-
-    // Validation
     if (validateMove()) {
       let finish: MoveResFinnishDTO | undefined;
 
-      if (moveReq.san[moveReq.san.length-1] === "#") {
-
-        // Mate
-        finish = {
-          winner: moveReq.player.toUpperCase() as ("W" | "B")
-        }
-
-      }
-      else if(checkDraw()) {
-        finish = {
-          winner: null
-        }
+      if (moveReq.san[moveReq.san.length - 1] === "#") {
+        finish = { winner: moveReq.player.toUpperCase() as "W" | "B" };
+      } else if (checkDraw()) {
+        finish = { winner: null };
       }
 
       const moveRes: MoveResponseDTO = {
         ...moveReq,
-        finish: finish
-      }
+        finish,
+      };
 
-      socket.broadcast.emit("move", JSON.stringify(moveRes));
-      
-      console.log("Move responded: ", moveRes);
+      io.to(moveReq.gameId).emit("move", JSON.stringify(moveRes));
+      console.log("Move broadcasted to room:", moveReq.gameId, moveRes);
     }
   });
 
