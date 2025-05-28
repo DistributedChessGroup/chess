@@ -37,18 +37,26 @@ io.on("connection", (socket) => {
     const moveReq: MoveRequestDTO & { gameId: string } = JSON.parse(moveReqStr);
     console.log("Move requested", moveReq);
 
+    let valid = false;
     if (validateMove()) {
-      let finish: MoveResFinnishDTO | undefined;
+      valid = true;
 
+      // TODO - actually calculate new state
+      let gameState = moveReq.after
+      let finish: MoveResFinnishDTO = { winner: null };
+      
       if (moveReq.san[moveReq.san.length - 1] === "#") {
+        // Mate
         finish = { winner: moveReq.player.toUpperCase() as "W" | "B" };
       } else if (checkDraw()) {
+        // Draw
         finish = { winner: null };
       }
 
       const moveRes: MoveResponseDTO = {
-        ...moveReq,
-        finish,
+        valid,
+        gameState,
+        finish
       };
 
       io.to(moveReq.gameId).emit("move", JSON.stringify(moveRes));

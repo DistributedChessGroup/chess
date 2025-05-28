@@ -25,12 +25,17 @@ function ChessGame() {
 
     socket.current.on("move", (moveStr: string) => {
       const move = JSON.parse(moveStr);
-      game.move({
-        from: move.from,
-        to: move.to,
-        promotion: "q",
-      });
-      setFen(game.fen());
+      console.log(move)
+      
+      const newFen = move.gameState;
+      game.load(newFen);
+      setFen(newFen);
+
+      if (!move.valid) {
+        console.log("MOVE INVALID")
+        // if move was not valid -> display message -> toast.message()... whatever 
+      }
+      
     });
 
     return () => {
@@ -45,8 +50,9 @@ function ChessGame() {
       promotion: "q",
     });
 
+    console.log(result)
+
     if (result) {
-      setFen(game.fen());
 
       const moveDto: MoveDTO & { gameId: string } = {
         player: result.color,

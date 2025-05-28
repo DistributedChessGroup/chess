@@ -13,12 +13,7 @@ export interface MoveResFinnishDTO {
 }
 
 export interface MoveResponseDTO {
-  player: "W" | "B";
-  before: string;
-  after: string;
-  san: string;
-  from: string;
-  to: string;
-  promotion?: string;
-  finish?: MoveResFinnishDTO
+  valid: boolean;
+  gameState: string; // fen after making (or failing) move
+  finish: MoveResFinnishDTO
 }
