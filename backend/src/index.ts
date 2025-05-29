@@ -149,7 +149,7 @@ io.on("connection", (socket) => {
     if (result.san[result.san.length - 1] === "#") {
       // Mate
       finish = socket.data.color as "white" | "black";
-    } else if (checkDraw()) {
+    } else if (false) {
       // Draw
       finish = "draw";
     }
