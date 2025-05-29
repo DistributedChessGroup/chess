@@ -1,19 +1,10 @@
 export interface MoveRequestDTO {
-  player: string;
-  before: string;
-  after: string;
-  san: string;
   from: string;
   to: string;
-  promotion?: string
-}
-
-export interface MoveResFinnishDTO {
-  winner: "W" | "B" | null
+  promotion?: string;
 }
 
 export interface MoveResponseDTO {
-  valid: boolean;
-  gameState: string; // fen after making (or failing) move
-  finish: MoveResFinnishDTO
+  fen: string; // game state after making correct move
+  finish: "" | "white" | "black" | "draw";
 }
