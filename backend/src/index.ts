@@ -19,7 +19,7 @@ interface Game {
   end: boolean; // tracks if the game has ended
 }
 
-// the key (string) is a game id in the format: game1, game2, ...
+// The key (string) is a game id in the format: game1, game2, ...
 const games: Record<string, Game> = {};
 let numOfGames = 0;
 
@@ -125,6 +125,7 @@ io.on("connection", (socket) => {
 
     let result = null;
     try {
+      // Check if it's currently the turn of the player who sent a move request
       const currentTurn = game.game.turn() === "w" ? "white" : "black";
       if (currentTurn !== socket.data.color) {
         socket.emit(
@@ -134,17 +135,13 @@ io.on("connection", (socket) => {
         return;
       }
 
-      // Attempt to make the move
+      // Attempt to make the move, this throws an error if a wrong move is made
       result = game.game.move(moveReq);
-      if (!result) {
-        socket.emit("invalidMove", "Illegal move: " + JSON.stringify(result));
-        return;
-      }
     } catch (err) {
-      console.log("Invalid move");
+      socket.emit("invalidMove", "Illegal move: " + JSON.stringify(result));
     }
 
-    // Handle the end of the game
+    // TODO: Handle the end of the game
     let finish: "" | "white" | "black" | "draw" = "";
     if (result.san[result.san.length - 1] === "#") {
       // Mate
@@ -176,7 +173,7 @@ io.on("connection", (socket) => {
 
     // If there is no other player in the game, delete it
     if (!game.white && !game.black) {
-      // delete the game
+      // Delete the game
       delete games[gameId];
       console.log(`Game ${gameId} deleted — no players left.`);
     }
