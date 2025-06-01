@@ -141,14 +141,14 @@ io.on("connection", (socket) => {
       socket.emit("invalidMove", "Illegal move: " + JSON.stringify(result));
     }
 
-    // TODO: Handle the end of the game
+    // Handle the end of the game
     let finish: "" | "white" | "black" | "draw" = "";
-    if (result.san[result.san.length - 1] === "#") {
-      // Mate
+    if (game.game.isCheckmate()) {
       finish = socket.data.color as "white" | "black";
-    } else if (false) {
-      // Draw
+      game.end = true;
+    } else if (game.game.isDraw() || game.game.isStalemate() || game.game.isThreefoldRepetition() || game.game.isInsufficientMaterial()) {
       finish = "draw";
+      game.end = true;
     }
 
     const response: MoveResponseDTO = {
