@@ -21,8 +21,14 @@ function ChessGame() {
   const [gameOverMessage, setGameOverMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const turn = game.turn();
-    setCurrentPlayer(turn === "w" ? "White" : "Black");
+    const turn = game.turn()
+    console.log(turn)
+
+    if(turn === 'w') {
+      setCurrentPlayer("White")
+    } else {
+      setCurrentPlayer("Black")
+    }
   }, [game]);
 
   useEffect(() => {
