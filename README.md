@@ -40,31 +40,34 @@ Real-time 1v1 chess using WebSockets.
 ├── package.json
 └── ...
 ```
-## Concurrent Programming Techniques
-On the Server-Side (Node.js):
+## How is concurrency achieved in our game
 
-- Node.js uses a single-threaded event loop with non-blocking I/O.
-- Socket.IO (built on top of Node.js and http module) uses asynchronous event-driven programming.
-- This allows Socket.IO to handle many concurrent client connections without creating a new thread for each.
+Our game is written in JavaScript and JavaScript has only one thread - it uses an event loop with non-blocking I/O to achieve concurrency.
 
-On the Client-Side (Browser):
+In our project, we are using a library Socket.IO that is basically a custom proctol built on top of WebSockets and is a very popular choice among developers.
+It establishes one TCP/IP connection and is much faster than REST API would be. It also enables real-time, bi-directional communication between web clients and servers
+which is perfect for our chess game where the players constantly make moves and want a response from the server without delay. We could have also used WebSockets but
+Socket.IO has many advantages over the normal WebSocket library such as automatic reconnection, event-based messaging, and support for broadcasting events/messages to multiple clients.
 
-- Each socket connection operates independently.
-- Event handlers like socket.on() are asynchronous callbacks.
-- Browsers use event loops and asynchronous APIs (like setTimeout, fetch, etc.), so Socket.IO fits well into that model.
+From the technical perspective, Socket.IO achieves concurrency with event-driven, non-blocking I/O model, allowing it to handle many client connections simultaneously without using multiple threads. 
+It processes each socket event asynchronously through the event loop, which results in concurrent communication across all connected clients.
+
+When 2 players join the game, on the backend their sockets join the same Socket.IO room which allows later for sending moves to all participants in the room - so that when one
+player makes a move, the second player also gets and sees it.
+
 
 ## Libraries and Tools used
 Frontend:
-- react
+- React
 - react-chessboard
 - chess.js – for validation and basic game logic
-- socket.io-client
+- Socket.IO (client)
 - react-hot-toast
-- tailwind
+- Tailwind CSS
 
 Backend:
-- express
-- socket.io
+- Express
+- Socket.IO
 - chess.js – for server-side move validation
 
 ## Contributions
