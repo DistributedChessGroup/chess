@@ -2,9 +2,12 @@
 
 A real-time multiplayer chess game built using React, TypeScript, Socket.IO, and Node.js, where players can play from different browser windows. Move validation occurs both on the frontend and backend, ensuring a synchronized and fair experience.
 
-<p align="center"> <img src="screenshots/game.jpg" alt="Gameplay" width="600"/> </p>(Gameplay)
+<p align="center"> <img src="screenshots/game.jpg" alt="Gameplay" width="600"/> </p>
+<p>(Gameplay)</p>
+
 <img src="screenshots/main_screen.jpg" alt="Gameplay" width="600"/>
-<p align="center"></p>(Joining game screen)
+<p align="center"></p>
+<p>(Joining game screen)</p>
 
 ## Features
 Real-time 1v1 chess using WebSockets.
@@ -42,7 +45,7 @@ On the Server-Side (Node.js):
 
 - Node.js uses a single-threaded event loop with non-blocking I/O.
 - Socket.IO (built on top of Node.js and http module) uses asynchronous event-driven programming.
-- This allows Socket.IO to handle many concurrent client connections without spawning a new thread for each.
+- This allows Socket.IO to handle many concurrent client connections without creating a new thread for each.
 
 On the Client-Side (Browser):
 
