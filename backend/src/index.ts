@@ -97,6 +97,27 @@ io.on("connection", (socket) => {
     socket.data.gameId = gameId;
 
     console.log(`User ${socket.id} joined game ${gameId}`);
+
+
+        // Handle the end of the game
+    let finish: "" | "white" | "black" | "draw" = "";
+    if (game.game.isCheckmate()) {
+      finish = socket.data.color as "white" | "black";
+      game.end = true;
+    } else if (game.game.isDraw() || game.game.isStalemate() || game.game.isThreefoldRepetition() || game.game.isInsufficientMaterial()) {
+      finish = "draw";
+      game.end = true;
+    }
+
+    const response: MoveResponseDTO = {
+      fen: game.game.fen(),
+      finish: finish,
+    };
+
+    io.to(gameId).emit("moveMade", response);
+
+
+
   });
 
   socket.on("makeMove", (moveReq: MoveRequestDTO) => {
