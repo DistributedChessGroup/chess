@@ -21,13 +21,12 @@ function ChessGame() {
   const [gameOverMessage, setGameOverMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const turn = game.turn()
-    console.log(turn)
+    const turn = game.turn();
 
-    if(turn === 'w') {
-      setCurrentPlayer("White")
+    if (turn === "w") {
+      setCurrentPlayer("White");
     } else {
-      setCurrentPlayer("Black")
+      setCurrentPlayer("Black");
     }
   }, [game]);
 
@@ -54,6 +53,14 @@ function ChessGame() {
       setGame(updatedGame);
       setGameId(response.gameId);
       console.log("Joined to a game:", response.gameId);
+      if (updatedGame.isGameOver()) {
+        if (updatedGame.isCheckmate()) {
+          const winner = updatedGame.turn() === "w" ? "Black" : "White";
+          setGameOverMessage(`${winner} wins by checkmate!`);
+        } else {
+          setGameOverMessage("Game drawn!");
+        }
+      }
     });
 
     socket.on("joinError", (message) => {
@@ -68,7 +75,7 @@ function ChessGame() {
 
       if (response.finish === "white" || response.finish === "black") {
         setGameOverMessage(
-          `${response.finish.charAt(0).toUpperCase() + response.finish.slice(1)} wins by checkmate!`
+          `${response.finish.charAt(0).toUpperCase() + response.finish.slice(1)} wins by checkmate!`,
         );
       } else if (response.finish === "draw") {
         setGameOverMessage("Game drawn!");
@@ -137,14 +144,14 @@ function ChessGame() {
       <Toaster position="top-center" />
       <h1 className="text-3xl font-bold mb-4">Real-Time Chess Game</h1>
       <div className="w-full max-w-md">
-        {(socketConnected && gameId) && (
+        {socketConnected && gameId && (
           <div>
-          <Chessboard
-            position={game.fen()}
-            onPieceDrop={handleMove}
-            autoPromoteToQueen={true}
-            boardOrientation={playerColor.current}
-          />
+            <Chessboard
+              position={game.fen()}
+              onPieceDrop={handleMove}
+              autoPromoteToQueen={true}
+              boardOrientation={playerColor.current}
+            />
             <h2 className="text-xl mt-4 text-center">
               {gameOverMessage
                 ? gameOverMessage
